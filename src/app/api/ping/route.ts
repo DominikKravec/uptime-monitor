@@ -77,8 +77,8 @@ export async function  GET() {
             if(res == null){
                 const newLog = await createLog(target.id, null, null, false)
             }else{
-                upTargetCount++
                 const isUp: boolean = res.statusCode >= 200 && res.statusCode <= 399
+                if(isUp) upTargetCount++
                 const newLog = await createLog(target.id, res.statusCode, res.latency, isUp)
             }
 
