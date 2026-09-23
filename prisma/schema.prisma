@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Target {
+  id        String    @id @default(uuid())
+  name      String    // e.g., "My Portfolio"
+  url       String    // e.g., "https://example.com"
+  interval  Int       @default(60) // How often to ping in seconds
+  active    Boolean   @default(true) // Ability to pause monitoring
+  createdAt DateTime  @default(now())
+  
+  logs      PingLog[] // Relation to the logs
+}
+
+model PingLog {
+  id           String   @id @default(uuid())
+  targetId     String
+  statusCode   Int?     // e.g., 200, 404, 500
+  responseTime Int?     // Latency in milliseconds
+  isUp         Boolean  // True if status is 200-299
+  timestamp    DateTime @default(now())
+
+  target       Target   @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  
+  @@index([targetId]) // Crucial for backend performance when querying charts
+}
