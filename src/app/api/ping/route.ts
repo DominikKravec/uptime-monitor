@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+interface target {
+ id: string;
+ name: string;
+ url: string;
+ interval: number;
+ active: boolean;
+ createdAt: Date;
+}
+
 // Instantiate the Prisma client outside the function so it can be reused
 const prisma = new PrismaClient();
 
@@ -55,6 +64,31 @@ const createLog = async (targetId: string, statusCode: number | null, responseTi
     }
 }
 
+const checkPingInterval = async (target: target): Promise<Boolean> => {
+    
+    //get the last log
+
+    const lastLog = await prisma.pingLog.findFirst({
+        where: {
+            targetId: target.id
+        },
+        orderBy: {
+            timestamp: 'desc'
+        }
+    })
+
+    if( !lastLog ){
+        return true
+    }
+
+    const now = new Date()
+
+    const check_date = new Date(now.getTime() - target.interval * 1000);
+
+    return lastLog.timestamp < check_date
+
+}
+
 export async function  GET() {
 
     try{        
@@ -66,8 +100,15 @@ export async function  GET() {
         })
 
         let upTargetCount = 0
+        let skipped = 0
 
         for(let target of activeTargets){
+
+            if( ! await checkPingInterval(target) ) {
+                console.log("Skipping " + target.url)
+                skipped++
+                continue
+            }
 
             const targetUrl: string = target.url
                
@@ -84,7 +125,7 @@ export async function  GET() {
 
         }
 
-        return NextResponse.json({"success": true, "pingedTargets": activeTargets.length, "upTargets": upTargetCount})
+        return NextResponse.json({"success": true, "pingedTargets": activeTargets.length, "upTargets": upTargetCount, "skippedDueToInterval": skipped})
 
     }catch(error){
         console.error("Database query failed:", error);
