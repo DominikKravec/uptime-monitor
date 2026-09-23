@@ -44,3 +44,6 @@ next-env.d.ts
 .claude
 .cursor
 .devin
+get-docker.sh
+AGENTS.md
+CLAUDE.md
