@@ -6,8 +6,7 @@ const prisma = new PrismaClient();
 
 const TIME_OUT = 10000;
 
-//returns [statusCode, latency]
-const ping = async (targetURL: string): Promise<[number, number] | null> => {
+const ping = async (targetURL: string): Promise<{ statusCode: number; latency: number } | null> => {
     const startTime = performance.now()
 
         try{
@@ -25,7 +24,10 @@ const ping = async (targetURL: string): Promise<[number, number] | null> => {
             const endTime = performance.now()
             const latency = Math.round(endTime - startTime)
 
-            return [response.status, latency]
+            return {
+                statusCode: response.status,
+                latency: latency
+            }
             
         }catch(error){
             console.log("Website is unreachable or timed out!!!")
@@ -34,7 +36,7 @@ const ping = async (targetURL: string): Promise<[number, number] | null> => {
     return null
 }
 
-const createLog = async (targetId: string, statusCode: number, responseTime: number, isUp: boolean) => {
+const createLog = async (targetId: string, statusCode: number | null, responseTime: number | null, isUp: boolean) => {
 
     try{
         const newLog = await prisma.pingLog.create({
@@ -45,6 +47,8 @@ const createLog = async (targetId: string, statusCode: number, responseTime: num
                 isUp: isUp
             }
         })
+
+        return newLog
 
     }catch{
         console.log("Error creating log for " + targetId)
@@ -61,15 +65,26 @@ export async function  GET() {
             }
         })
 
+        let upTargetCount = 0
+
         for(let target of activeTargets){
 
             const targetUrl: string = target.url
                
             const res = await ping(targetUrl)
             console.log(targetUrl + " " + res)
+
+            if(res == null){
+                const newLog = await createLog(target.id, null, null, false)
+            }else{
+                upTargetCount++
+                const isUp: boolean = res.statusCode >= 200 && res.statusCode <= 399
+                const newLog = await createLog(target.id, res.statusCode, res.latency, isUp)
+            }
+
         }
 
-        return NextResponse.json({"success": true})
+        return NextResponse.json({"success": true, "pingedTargets": activeTargets.length, "upTargets": upTargetCount})
 
     }catch(error){
         console.error("Database query failed:", error);
