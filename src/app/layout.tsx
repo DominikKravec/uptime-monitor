@@ -24,16 +24,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full grid grid-cols-[auto_1fr]">
-        <section id="left-bar" className="bg-blue-500 w-75 px-5">
-          <IconButton
-            name={"Add app"}
-          />
-        </section>
-
-        <section className="bg-red-500">
+      <body className="min-h-full flex ">
+       
           {children}
-        </section>
+     
       </body>
     </html>
   );

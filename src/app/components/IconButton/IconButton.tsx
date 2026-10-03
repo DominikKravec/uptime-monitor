@@ -4,7 +4,7 @@ import React from 'react'
 
 interface IconButtonProps{
     name: string,
-    action: () => {},
+    action: () => void,
     icon: string,
 }
 
