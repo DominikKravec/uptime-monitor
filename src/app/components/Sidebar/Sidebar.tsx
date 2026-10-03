@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import SearchBar from '../SearchBar/SearchBar'
 import { useAppContext } from '@/providers/AppProvider'
 import Link from 'next/link'
+import AddAppModal from '../AddAppModal/AddAppModal'
 
 interface SidebarProps{}
 
@@ -13,8 +14,10 @@ const Sidebar: React.FC<SidebarProps> = () => {
 
     const {targets} = useAppContext()
 
+    const [modal, setModal] = useState(false)
+
     return (
-        <section className='min-h-full w-50 px-5 flex flex-col'>
+        <section className='min-h-full relative w-50 px-5 flex flex-col'>
             <IconButton
                 name={'Home'}
                 action={() => {redirect("/dashboard/")}}
@@ -23,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
 
             <IconButton
                 name={'Add app'}
-                action={() => {alert("Addding app")}}
+                action={() => {setModal(true)}}
                 icon={''/* TODO !!! */} 
             />
 
@@ -51,6 +54,11 @@ const Sidebar: React.FC<SidebarProps> = () => {
                     )
                 )
             }
+
+            <AddAppModal
+                isActive={modal}
+                setIsActive={setModal}
+            />
 
         </section>
     )
