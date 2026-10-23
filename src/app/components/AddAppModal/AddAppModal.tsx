@@ -17,15 +17,48 @@ interface TargetProps{
 
 const AddAppModal: React.FC<AddAppModalProps> = ({isActive, setIsActive}) => {
 
+    
     const [targetProps, setTargetProps] = useState({
         name: "",
         url: "",
         interval: 60,
-        active: true
     })
+    
+    if(!isActive) return null
+    
+    const saveToDB = async () => {
+
+        try{
+
+            const response = await fetch('/api/targets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(targetProps)
+            })
+
+            const result = await response.json()
+
+            if(result.success){
+                setIsActive(false)
+                setTargetProps({
+                    name: "",
+                    url: "",
+                    interval: 60,
+                })
+            }else{
+                alert("Error: " + result.error)
+            }
+
+        }catch(error){
+            alert("Failed to save target!!!\n" + error)
+        }
+
+    }
 
     return (
-        <div className={"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm " + (isActive ? '' : 'hidden')}>
+        <div className={"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm "}>
             
             <div className="relative flex flex-col bg-gray-500 p-10 rounded-lg shadow-xl w-96 gap-4">
                 
@@ -62,7 +95,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({isActive, setIsActive}) => {
                 <div className='flex items-center justify-center'>
                     <IconButton
                         name='Save App'
-                        action={() => {}}
+                        action={() => {saveToDB()}}
                         icon=''
                     />
                 </div>
