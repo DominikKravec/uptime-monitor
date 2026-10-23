@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import TextInput from '../TextInput/TextInput'
 import NumberInput from '../NumberInput/NumberInput'
 import IconButton from '../IconButton/IconButton'
+import { useAppContext } from '@/providers/AppProvider'
 
 interface AddAppModalProps{
     isActive: boolean
@@ -17,6 +18,7 @@ interface TargetProps{
 
 const AddAppModal: React.FC<AddAppModalProps> = ({isActive, setIsActive}) => {
 
+    const { refreshTargets } = useAppContext()
     
     const [targetProps, setTargetProps] = useState({
         name: "",
@@ -47,6 +49,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({isActive, setIsActive}) => {
                     url: "",
                     interval: 60,
                 })
+                await refreshTargets()
             }else{
                 alert("Error: " + result.error)
             }

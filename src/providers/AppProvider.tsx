@@ -9,6 +9,7 @@ interface AppContextType {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   isLoading: boolean;
+  refreshTargets: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -18,29 +19,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadTargets = async () => {
-      try {
-
-        //TODO: add queries
-
-        const res = await fetch('/api/targets');
-        const result = await res.json();
-        if (result.success) {
-          setTargets(result.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch targets", error);
-      } finally {
-        setIsLoading(false);
+  const loadTargets = async () => {
+    try {
+      //TODO: add queries
+      const res = await fetch('/api/targets');
+      const result = await res.json();
+      if (result.success) {
+        setTargets(result.data);
       }
-    };
-    
+    } catch (error) {
+      console.error("Failed to fetch targets", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadTargets();
   }, []);
 
   return (
-    <AppContext.Provider value={{ targets, searchQuery, setSearchQuery, isLoading }}>
+    <AppContext.Provider value={{ targets, searchQuery, setSearchQuery, isLoading, refreshTargets: loadTargets }}>
       {children}
     </AppContext.Provider>
   );
