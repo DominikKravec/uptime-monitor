@@ -1,2 +1,19 @@
 @import "tailwindcss";
 
+:root {
+  --bg-black: #161616;
+  --fg-white: #ffffff;
+  --accent-blue: #00d9ff;
+}
+
+@theme {
+  --color-bg-black: #161616;
+  --color-fg-white: #ffffff;
+  --color-accent-blue: #00d9ff;
+}
+
+body {
+  background-color: var(--bg-black);
+  color: var(--fg-white);
+  font-family: var(--font-geist-sans), sans-serif;
+}

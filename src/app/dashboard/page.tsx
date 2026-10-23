@@ -1,31 +1,42 @@
 "use client"
 
-
+import React from "react";
 import AppCard from "../components/AppCard/AppCard";
-
 import { useAppContext } from "@/providers/AppProvider";
 
 export default function Home() {
+  const { targets, searchQuery } = useAppContext();
 
-  const {targets} = useAppContext()
+  const displayCards = targets.map((target) => ({
+        id: target.id,
+        name: target.name,
+        url: target.url,
+        active: target.active,
+        statusCode: target.active ? 200 : null,
+        latency: target.active ? 50 : null,
+      }))
+    ;
+
+  const filteredCards = displayCards.filter((card) =>
+    card.name.toLowerCase().includes((searchQuery || "").toLowerCase()) ||
+    card.url.toLowerCase().includes((searchQuery || "").toLowerCase())
+  );
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold">Uptime Monitor</h1>
-
-      <section>
-        {targets.map(target => (
+    <div className="w-full">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-7xl">
+        {filteredCards.map((card) => (
           <AppCard
-            name={target.name}
-            URL={target.url}
-            isActive={target.active}
+            key={card.id}
+            id={card.id}
+            name={card.name}
+            URL={card.url}
+            isActive={card.active}
+            statusCode={card.statusCode}
+            latency={card.latency}
           />
-        ))
-        }
-        
-      </section>
-
-
-    </main>
+        ))}
+      </div>
+    </div>
   );
 }
