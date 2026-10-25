@@ -12,9 +12,9 @@ export async function GET(
         const { searchParams } = new URL(request.url);
 
         const limit = parseInt(searchParams.get('limit') || '20', 10)
-        const id = params.id
+        const { id } = await params;
 
-        const logs = prisma.pingLog.findMany({
+        const logs = await prisma.pingLog.findMany({
             where: {
                 targetId: id
             },

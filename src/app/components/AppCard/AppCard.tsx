@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useId } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface AppCardProps {
@@ -18,8 +18,6 @@ const AppCard: React.FC<AppCardProps> = ({
     name,
     URL,
     isActive,
-    statusCode = 200,
-    latency = 50,
     onClick,
 }) => {
     const router = useRouter();
@@ -32,6 +30,46 @@ const AppCard: React.FC<AppCardProps> = ({
             router.push(`/dashboard/${id}`);
         }
     };
+
+    const [statusCode, setStatusCode] = useState('')
+    const [latency, setLatency] = useState('')
+
+    useEffect(() => {
+
+        const getLogs = async () => {
+
+            try{
+                const LOG_LIMIT = 10
+    
+                const response = await fetch(`/api/targets/${id}/logs?limit=${LOG_LIMIT}`)
+    
+                const result = await response.json()
+
+                if(result.success){
+                    const lastLog = result.data[0]
+
+                    if(lastLog){
+                        setLatency(lastLog.responseTime)
+                        setStatusCode(lastLog.statusCode)
+                    }
+
+
+                }else{
+                    alert("Logs unreachable: " + result.error)
+                }
+
+            }catch(error){
+                alert("There was an error getting logs: " + error)
+            }
+
+
+
+            setTimeout(() => {getLogs()}, 5000)
+        }
+
+        getLogs()
+
+    }, [])
 
     return (
         <div

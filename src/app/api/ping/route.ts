@@ -39,7 +39,7 @@ const ping = async (targetURL: string): Promise<{ statusCode: number; latency: n
             }
             
         }catch(error){
-            console.log("Website is unreachable or timed out!!!")
+            console.log(`Website ${targetURL} is unreachable or timed out!!!\n` + error)
         }
 
     return null
