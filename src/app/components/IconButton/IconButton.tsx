@@ -3,28 +3,39 @@
 import React from 'react'
 
 interface IconButtonProps {
-    name: string
+    name?: string
     action: () => void
     icon: string
     className?: string
+    disabled?: boolean
+    title?: string
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ name, action, icon, className = "" }) => {
+const IconButton: React.FC<IconButtonProps> = ({
+    name,
+    action,
+    icon,
+    className = "text-xl md:text-2xl w-full",
+    disabled = false,
+    title,
+}) => {
   return (
     <button
       type="button"
       onClick={action}
-      className={`flex items-center gap-3 w-full py-2 text-left text-white text-xl md:text-2xl font-normal transition-opacity hover:opacity-80 cursor-pointer ${className}`}
+      disabled={disabled}
+      title={title || name}
+      className={`flex items-center gap-3 py-1.5 text-left text-white font-normal transition-opacity hover:opacity-80 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
     >
       {icon && (
         <img
           src={icon}
-          alt={name}
+          alt={name || "icon"}
           className="w-7 h-7 object-contain shrink-0"
         />
       )}
 
-      <span>{name}</span>
+      {name && <span>{name}</span>}
     </button>
   )
 }

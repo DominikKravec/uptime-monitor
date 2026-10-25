@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppContext } from "@/providers/AppProvider";
 import Switch from "@/app/components/Switch/Switch";
+import IconButton from "@/app/components/IconButton/IconButton";
 
 export default function AppDetailsPage() {
   const router = useRouter();
@@ -24,6 +25,10 @@ export default function AppDetailsPage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingUrl, setIsEditingUrl] = useState(false);
   const [isEditingDelay, setIsEditingDelay] = useState(false);
+
+  // Saving state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +75,41 @@ export default function AppDetailsPage() {
       delayInputRef.current.select();
     }
   }, [isEditingDelay]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      
+      const response = await fetch('/api/targets/' + id, {
+        method: 'PUT',
+        headers: {
+          "Content-type": "aplication/json",
+        },
+
+        body: JSON.stringify({
+          name: name,
+          url: url,
+          interval: pingDelay,
+          active: isTracked
+        })
+
+      })
+
+      const result = await response.json()
+
+      if(!result.success){
+        alert("Unable to save changes!!!\n" + result.error)
+      }else{
+        router.push('/dashboard')
+        window.location.reload()
+      }
+
+    }catch(error){
+      alert("There was an error saving the changes: " + error)
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const removeTarget = async () => {
     if (!window.confirm("Are you sure you want to delete this app?")) return;
@@ -170,8 +210,8 @@ export default function AppDetailsPage() {
       </div>
 
       {/* Metadata Overview */}
-      <div className="flex flex-wrap items-start justify-between gap-y-4 max-w-2xl mb-10">
-        {/* Left Column: URL, Ping delay, Tracked switch */}
+      <div className="flex flex-wrap items-start justify-between gap-y-4 max-w-2xl mb-6">
+        {/* Left Column: URL, Ping delay, Tracked switch, Save Button */}
         <div className="flex flex-col gap-3 min-w-[240px]">
           {/* URL Row */}
           <div className="flex items-center gap-1.5 text-base">
@@ -236,6 +276,17 @@ export default function AppDetailsPage() {
             <Switch
               checked={isTracked}
               onChange={setIsTracked}
+            />
+          </div>
+
+          {/* Save Button (Between Tracked Switch and Graph) */}
+          <div className="mt-1">
+            <IconButton
+              name={isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save"}
+              icon="/Save.svg"
+              action={handleSave}
+              disabled={isSaving}
+              className="w-fit text-base py-1 px-0 hover:opacity-80"
             />
           </div>
         </div>
