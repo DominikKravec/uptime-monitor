@@ -6,8 +6,6 @@ import { useAppContext } from "@/providers/AppProvider";
 
 export default function Home() {
 
-  fetch('/api/ping')
-
   const { targets, searchQuery } = useAppContext();
 
   const displayCards = targets.map((target) => ({

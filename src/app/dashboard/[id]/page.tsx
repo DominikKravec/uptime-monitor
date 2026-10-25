@@ -97,6 +97,42 @@ export default function AppDetailsPage() {
     }
   };
 
+  const [latency, setLatency] = useState('')
+  const [statusCode, setStatusCode] = useState('')
+
+  useEffect(() => {
+    const getLogs = async () => {
+
+            try{
+                const LOG_LIMIT = 50
+    
+                const response = await fetch(`/api/targets/${id}/logs?limit=${LOG_LIMIT}`)
+    
+                const result = await response.json()
+
+                if(result.success){
+                    const lastLog = result.data[0]
+
+                    if(lastLog){
+                        setLatency(lastLog.responseTime)
+                        setStatusCode(lastLog.statusCode)
+                    }
+
+
+                }else{
+                    alert("Logs unreachable: " + result.error)
+                }
+
+            }catch(error){
+                alert("There was an error getting logs: " + error)
+            }
+
+            setTimeout(() => {getLogs()}, 5000)
+        }
+
+        getLogs()
+  }, [])
+
   if (isLoading && targets.length === 0) {
     return (
       <div className="p-8 text-neutral-400 text-lg">Loading...</div>
@@ -207,11 +243,11 @@ export default function AppDetailsPage() {
         {/* Right Column: Status, Latency */}
         <div className="flex flex-col gap-3 min-w-[180px]">
           <div className="text-base text-[#8f96a3]">
-            Status: <span className="font-bold text-white">200</span>
+            Status: <span className="font-bold text-white">{statusCode}</span>
           </div>
           <div className="text-base text-[#8f96a3]">
             Latency:{" "}
-            <span className="font-bold text-white">60</span>{" "}
+            <span className="font-bold text-white">{latency}</span>{" "}
             <span className="text-[#8f96a3]">ms</span>
           </div>
         </div>
