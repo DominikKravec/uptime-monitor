@@ -61,8 +61,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
             {/* App Targets List */}
             <nav className="flex flex-col gap-2">
                 {filteredTargets.map(target => {
-                    const isCurrent = pathname === `/dashboard/${target.id}` || 
-                        (targets.length === 0 && target.name === 'Highlighted')
+                    const isCurrent = pathname === `/dashboard/${target.id}` || pathname === `/dashboard/${target.name}`
 
                     return (
                         <Link

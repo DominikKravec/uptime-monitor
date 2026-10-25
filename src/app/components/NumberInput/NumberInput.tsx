@@ -22,6 +22,7 @@ const NumberInput: React.FC<NumberInputProps> = ({value, setValue, onSubmit, pla
             onSubmit()
         }}
         placeholder={placeholder}
+        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
     </div>
   )
